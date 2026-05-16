@@ -90,3 +90,19 @@ def clear_chat(notice_id: str):
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@router.get("/chat/history/{notice_id}")
+def get_history(notice_id: str):
+    """
+    Returns full chat history for a notice.
+    Called on page load and when switching notices.
+    """
+    try:
+        history = get_chat_history(notice_id)
+        return {
+            "success": True,
+            "history": history
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

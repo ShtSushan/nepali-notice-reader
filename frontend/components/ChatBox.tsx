@@ -17,22 +17,50 @@ const INITIAL_MESSAGE: Message = {
 };
 
 export default function ChatBox({ noticeId }: Props) {
-  const [messages,  setMessages]  = useState<Message[]>([INITIAL_MESSAGE]);
-  const [input,     setInput]     = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const bottomRef                 = useRef<HTMLDivElement>(null);
-  const inputRef                  = useRef<HTMLInputElement>(null);
+  const [messages,     setMessages]     = useState<Message[]>([INITIAL_MESSAGE]);
+  const [input,        setInput]        = useState("");
+  const [isLoading,    setIsLoading]    = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef  = useRef<HTMLInputElement>(null);
 
   // auto scroll to bottom on new message
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // reset chat when notice changes
+  // load chat history when notice changes
   useEffect(() => {
-    setMessages([INITIAL_MESSAGE]);
-    setInput("");
+    loadHistory();
   }, [noticeId]);
+
+  const loadHistory = async () => {
+    setIsLoadingHistory(true);
+    try {
+      const res  = await fetch(`http://127.0.0.1:8000/chat/history/${noticeId}`);
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.detail);
+
+      if (data.history && data.history.length > 0) {
+        // convert DB format {role, content} to Message format
+        const loaded: Message[] = data.history.map((m: any) => ({
+          role:    m.role,
+          content: m.content
+        }));
+        setMessages(loaded);
+      } else {
+        // no history yet — show initial greeting
+        setMessages([INITIAL_MESSAGE]);
+      }
+    } catch (err) {
+      // fallback to initial greeting on error
+      setMessages([INITIAL_MESSAGE]);
+    } finally {
+      setIsLoadingHistory(false);
+      inputRef.current?.focus();
+    }
+  };
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -40,7 +68,6 @@ export default function ChatBox({ noticeId }: Props) {
     const userMessage = input.trim();
     setInput("");
 
-    // add user message instantly
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
 
@@ -56,9 +83,7 @@ export default function ChatBox({ noticeId }: Props) {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.detail || "Failed to get answer");
-      }
+      if (!response.ok) throw new Error(data.detail || "Failed to get answer");
 
       setMessages((prev) => [
         ...prev,
@@ -75,7 +100,6 @@ export default function ChatBox({ noticeId }: Props) {
       ]);
     } finally {
       setIsLoading(false);
-      // re-focus input after response
       inputRef.current?.focus();
     }
   };
@@ -93,7 +117,7 @@ export default function ChatBox({ noticeId }: Props) {
         method: "DELETE"
       });
     } catch (err) {
-      // silently fail — UI reset is more important
+      // silently fail
     } finally {
       setMessages([INITIAL_MESSAGE]);
       setInput("");
@@ -121,35 +145,48 @@ export default function ChatBox({ noticeId }: Props) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`
-                max-w-[80%] px-4 py-2 rounded-2xl text-sm
-                ${msg.role === "user"
-                  ? "bg-blue-500 text-white rounded-br-none"
-                  : "bg-gray-100 text-gray-800 rounded-bl-none"
-                }
-              `}
-            >
-              {msg.content}
-            </div>
-          </div>
-        ))}
 
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-gray-100 px-4 py-3 rounded-2xl rounded-bl-none">
-              <div className="flex gap-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-              </div>
+        {/* history loading spinner */}
+        {isLoadingHistory ? (
+          <div className="flex justify-center items-center h-full">
+            <div className="flex flex-col items-center gap-2 text-gray-400">
+              <div className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+              <p className="text-xs">Loading conversation...</p>
             </div>
           </div>
+        ) : (
+          <>
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`
+                    max-w-[80%] px-4 py-2 rounded-2xl text-sm
+                    ${msg.role === "user"
+                      ? "bg-blue-500 text-white rounded-br-none"
+                      : "bg-gray-100 text-gray-800 rounded-bl-none"
+                    }
+                  `}
+                >
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 px-4 py-3 rounded-2xl rounded-bl-none">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
         <div ref={bottomRef} />
       </div>
@@ -162,13 +199,13 @@ export default function ChatBox({ noticeId }: Props) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          disabled={isLoading}
+          disabled={isLoading || isLoadingHistory}
           placeholder="Ask about deadlines, fees, requirements..."
           className="flex-1 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-400 disabled:bg-gray-50 disabled:cursor-not-allowed"
         />
         <button
           onClick={sendMessage}
-          disabled={isLoading || !input.trim()}
+          disabled={isLoading || isLoadingHistory || !input.trim()}
           className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors"
         >
           Send

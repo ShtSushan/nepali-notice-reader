@@ -7,3 +7,4 @@ uploads/
 .ipynb_checkpoints/
 node_modules/
 .next/
+frontend/.env.local

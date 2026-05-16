@@ -68,7 +68,29 @@ def get_all_notices(user_id: str) -> list[dict]:
 
     return response.data
 
+def delete_notice(notice_id: str) -> None:
+    """
+    Deletes a notice and all its related data.
+    Order matters — delete children before parent.
+    """
+    # delete chat history
+    supabase.table("conversations")\
+        .delete()\
+        .eq("notice_id", notice_id)\
+        .execute()
 
+    # delete chunks
+    supabase.table("notice_chunks")\
+        .delete()\
+        .eq("notice_id", notice_id)\
+        .execute()
+
+    # delete notice itself
+    supabase.table("notices")\
+        .delete()\
+        .eq("id", notice_id)\
+        .execute()
+    
 # ── 2. NOTICE CHUNKS ─────────────────────
 
 def save_chunks(notice_id: str, chunks: list[dict]) -> None:

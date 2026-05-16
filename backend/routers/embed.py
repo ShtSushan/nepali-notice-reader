@@ -6,7 +6,7 @@
 # ─────────────────────────────────────────
 
 from fastapi import APIRouter, HTTPException
-from backend.services.db_service import get_all_notices, update_active_notice
+from backend.services.db_service import get_all_notices, update_active_notice, get_or_create_user, delete_notice  
 
 router = APIRouter()
 
@@ -41,5 +41,32 @@ def switch_notice(user_id: str, notice_id: str):
             "notice_id": notice_id
         }
 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/embed/user")
+def get_user(email: str):
+    """
+    Gets or creates a user by email.
+    Called on page load to restore session.
+    """
+    try:
+        user = get_or_create_user(email)
+        return {
+            "success": True,
+            "user_id": user["id"]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.delete("/notices/{notice_id}")
+def remove_notice(notice_id: str):
+    """
+    Deletes a notice and all related data.
+    Called when user clicks Delete in sidebar.
+    """
+    try:
+        delete_notice(notice_id)
+        return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
