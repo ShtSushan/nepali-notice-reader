@@ -1,0 +1,31 @@
+# ─────────────────────────────────────────
+#   Nepal Notice Reader — Python Dependencies
+#   Install: pip install -r requirements.txt
+# ─────────────────────────────────────────
+
+# ── API Framework ──
+fastapi
+uvicorn
+python-multipart        # for file upload handling
+
+# ── Environment ──
+python-dotenv
+
+# ── OCR ──
+pytesseract             # Python wrapper for Tesseract
+Pillow                  # image processing
+
+# ── AI / LLM ──
+groq                    # Groq API (translation, summarization, Q&A)
+google-genai            # Gemini API (optional fallback OCR)
+
+# ── Embeddings ──
+sentence-transformers   # multilingual embeddings (local, free)
+
+# ── Database ──
+supabase                # Supabase Python client (PostgreSQL + pgvector)
+
+# ── Notebook (development only) ──
+jupyter
+notebook
+ipykernel
