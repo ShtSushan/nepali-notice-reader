@@ -29,7 +29,7 @@ export default function LoginPage() {
         // ── Sign Up ──
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        setMessage("Account created! Please check your email to confirm, then log in.");
+        setMessage(`Account created! We sent a confirmation email to ${email}. Click the link in that email, then come back here to log in.`);
 
       } else {
         // ── Log In ──

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   role:    "user" | "assistant";
@@ -22,7 +23,7 @@ export default function ChatBox({ noticeId }: Props) {
   const [isLoading,    setIsLoading]    = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const inputRef  = useRef<HTMLInputElement>(null);
+  const inputRef  = useRef<HTMLTextAreaElement>(null);
 
   // auto scroll to bottom on new message
   useEffect(() => {
@@ -67,6 +68,9 @@ export default function ChatBox({ noticeId }: Props) {
 
     const userMessage = input.trim();
     setInput("");
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+    }
 
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
@@ -170,7 +174,21 @@ export default function ChatBox({ noticeId }: Props) {
                     }
                   `}
                 >
-                  {msg.content}
+                  {msg.role === "assistant" ? (
+                    <ReactMarkdown
+                      components={{
+                        p:      ({node, ...props}) => <p className="mb-1 last:mb-0" {...props} />,
+                        strong: ({node, ...props}) => <strong className="font-semibold" {...props} />,
+                        ul:     ({node, ...props}) => <ul className="list-disc list-inside space-y-1 mt-1" {...props} />,
+                        ol:     ({node, ...props}) => <ol className="list-decimal list-inside space-y-1 mt-1" {...props} />,
+                        li:     ({node, ...props}) => <li className="ml-2" {...props} />,
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  ) : (
+                    msg.content
+                  )}
                 </div>
               </div>
             ))}
@@ -193,15 +211,21 @@ export default function ChatBox({ noticeId }: Props) {
 
       {/* Input */}
       <div className="p-4 border-t flex gap-2">
-        <input
+        <textarea
           ref={inputRef}
-          type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => {
+            setInput(e.target.value);
+            // auto grow
+            e.target.style.height = "auto";
+            e.target.style.height = e.target.scrollHeight + "px";
+          }}
           onKeyDown={handleKeyDown}
           disabled={isLoading || isLoadingHistory}
           placeholder="Ask about deadlines, fees, requirements..."
-          className="flex-1 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-400 disabled:bg-gray-50 disabled:cursor-not-allowed"
+          rows={1}
+          className="flex-1 border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-400 disabled:bg-gray-50 disabled:cursor-not-allowed resize-none overflow-hidden"
+          style={{ maxHeight: "120px" }}
         />
         <button
           onClick={sendMessage}

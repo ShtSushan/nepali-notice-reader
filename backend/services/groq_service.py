@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 from backend.prompts.templates import (
     TRANSLATION_PROMPT,
     SUMMARY_PROMPT,
-    QA_SYSTEM_PROMPT
+    QA_SYSTEM_PROMPT,
+    QA_USER_PROMPT
 )
 
 load_dotenv()
@@ -32,8 +33,12 @@ def translate_to_english(nepali_text: str) -> str:
             model=MODEL,
             messages=[
                 {
+                    "role": "system",
+                    "content": TRANSLATION_PROMPT
+                },
+                {
                     "role": "user",
-                    "content": TRANSLATION_PROMPT.format(nepali_text=nepali_text)
+                    "content": f"Translate this Nepali notice:\n\n{nepali_text}"
                 }
             ]
         )
@@ -120,8 +125,8 @@ def answer_question(
             *chat_history,
             # current user question
             {
-                "role": "user",
-                "content": user_question
+                 "role": "user",
+                 "content": QA_USER_PROMPT.format(question=user_question)
             }
         ]
 
