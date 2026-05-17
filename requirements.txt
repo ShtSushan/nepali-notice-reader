@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────
-#   Nepal Notice Reader — Python Dependencies
+#   Nepali Notice Reader — Python Dependencies
 #   Install: pip install -r requirements.txt
 # ─────────────────────────────────────────
 
@@ -14,6 +14,7 @@ python-dotenv
 # ── OCR ──
 pytesseract             # Python wrapper for Tesseract
 Pillow                  # image processing
+pdf2image               # converts PDF pages to images for OCR
 
 # ── AI / LLM ──
 groq                    # Groq API (translation, summarization, Q&A)
