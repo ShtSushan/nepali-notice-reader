@@ -1,3 +1,11 @@
+---
+title: Nepali Notice Reader
+emoji: 🇳🇵
+colorFrom: blue
+colorTo: red
+sdk: docker
+pinned: false
+---
 # 🇳🇵 Nepali Notice Reader
 
 An AI-powered web application that reads Nepali government notices, translates them into plain English, extracts key information, and lets users ask questions about the notice in a chat interface.
