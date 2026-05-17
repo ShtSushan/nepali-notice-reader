@@ -1,6 +1,6 @@
 ---
 title: Nepali Notice Reader
-emoji: 🇳🇵
+emoji: 📄
 colorFrom: blue
 colorTo: red
 sdk: docker
