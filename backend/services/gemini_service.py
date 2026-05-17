@@ -10,13 +10,12 @@ from PIL import Image
 from pdf2image import convert_from_bytes
 import io
 
-# ── Point to Tesseract executable (Windows path) ──
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
-# ── Poppler path (Windows) — pdf2image needs this ──
-# Download from: https://github.com/oschwartz10612/poppler-windows/releases
-# Extract and point this to the bin/ folder inside
-POPPLER_PATH =  r"C:\poppler\poppler-26.02.0\Library\bin"
+import platform
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    POPPLER_PATH = r"C:\poppler\poppler-26.02.0\Library\bin"
+else:
+    POPPLER_PATH = None  # Linux — found automatically
 
 # ── Tesseract config ──
 TESSERACT_CONFIG = "--psm 6"
