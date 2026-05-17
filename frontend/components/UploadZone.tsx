@@ -33,7 +33,7 @@ export default function UploadZone({ onUploadSuccess, userEmail }: Props) {
       formData.append("file",  file);
       formData.append("email", userEmail);
 
-      const response = await fetch("http://127.0.0.1:8000/upload", {
+      const response = await fetch("https://sushanSht-nepali-notice-reader.hf.space/upload", {
         method: "POST",
         body:   formData,
       });

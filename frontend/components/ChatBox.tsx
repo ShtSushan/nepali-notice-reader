@@ -38,7 +38,7 @@ export default function ChatBox({ noticeId }: Props) {
   const loadHistory = async () => {
     setIsLoadingHistory(true);
     try {
-      const res  = await fetch(`http://127.0.0.1:8000/chat/history/${noticeId}`);
+      const res  = await fetch(`https://sushanSht-nepali-notice-reader.hf.space/chat/history/${noticeId}`);
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.detail);
@@ -76,7 +76,7 @@ export default function ChatBox({ noticeId }: Props) {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/chat", {
+      const response = await fetch("https://sushanSht-nepali-notice-reader.hf.space/chat", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({
@@ -117,7 +117,7 @@ export default function ChatBox({ noticeId }: Props) {
 
   const clearChat = async () => {
     try {
-      await fetch(`http://127.0.0.1:8000/chat/${noticeId}`, {
+      await fetch(`https://sushanSht-nepali-notice-reader.hf.space/chat/${noticeId}`, {
         method: "DELETE"
       });
     } catch (err) {

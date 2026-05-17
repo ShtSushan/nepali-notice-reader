@@ -49,12 +49,12 @@ export default function Home() {
     setIsRestoring(true);
     try {
       // get or create user
-      const userRes  = await fetch("http://127.0.0.1:8000/embed/user?email=" + encodeURIComponent(email));
+      const userRes  = await fetch("https://sushanSht-nepali-notice-reader.hf.space/embed/user?email=" + encodeURIComponent(email));
       const userData = await userRes.json();
       const uid      = userData.user_id;
 
       // load all notices
-      const noticesRes  = await fetch(`http://127.0.0.1:8000/embed/notices/${uid}`);
+      const noticesRes  = await fetch(`https://sushanSht-nepali-notice-reader.hf.space/embed/notices/${uid}`);
       const noticesData = await noticesRes.json();
 
       if (noticesData.notices && noticesData.notices.length > 0) {
@@ -63,7 +63,7 @@ export default function Home() {
         const latest = noticesData.notices[0];
         setActiveNoticeId(latest.id);
 
-        const sumRes  = await fetch(`http://127.0.0.1:8000/summarize/${latest.id}`);
+        const sumRes  = await fetch(`https://sushanSht-nepali-notice-reader.hf.space/summarize/${latest.id}`);
         const sumData = await sumRes.json();
         setSummary(sumData.summary);
       }
@@ -90,7 +90,7 @@ export default function Home() {
   const handleSwitchNotice = async (noticeId: string) => {
     setActiveNoticeId(noticeId);
     try {
-      const res  = await fetch(`http://127.0.0.1:8000/summarize/${noticeId}`);
+      const res  = await fetch(`https://sushanSht-nepali-notice-reader.hf.space/summarize/${noticeId}`);
       const data = await res.json();
       setSummary(data.summary);
     } catch (err) {
@@ -100,7 +100,7 @@ export default function Home() {
 
   const handleDeleteNotice = async (noticeId: string) => {
     try {
-      await fetch(`http://127.0.0.1:8000/notices/${noticeId}`, {
+      await fetch(`https://sushanSht-nepali-notice-reader.hf.space/notices/${noticeId}`, {
         method: "DELETE"
       });
     } catch (err) {
