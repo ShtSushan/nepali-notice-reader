@@ -55,7 +55,11 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <span className="text-5xl">🇳🇵</span>
+          <img
+            src="https://flagcdn.com/w160/np.png"
+            alt="Nepal Flag"
+            className="w-16 mx-auto"
+          />
           <h1 className="text-2xl font-bold text-gray-800 mt-3">
             Nepali Notice Reader
           </h1>
